@@ -1,10 +1,17 @@
 var express = require('express');
+var fs = require('fs');
+var https = require('https');
+var http = require('http');
 var bodyParser = require('body-parser')
 var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
 }));
+app.get('/', function(req, res) {
+	res.send("hello https?")
+});
+
 app.post('/', function (req, res) {
   console.log(req.body);
   var num = Math.random();
@@ -30,6 +37,10 @@ app.post('/', function (req, res) {
   }
 });
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
-});
+const options = {
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.crt'),
+  passphrase: '654321..'
+};
+http.createServer(app).listen(3001);
+https.createServer(options, app).listen(3000);
